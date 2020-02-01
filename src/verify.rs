@@ -2,6 +2,7 @@ use crate::core::{ Named, QueryFail };
 use crate::structures::Structure;
 use crate::query::Query;
 use rand::{ Rng, SeedableRng };
+use crate::debug::DebugRng;
 
 pub enum VerifyStatus {
     Yet,
@@ -33,13 +34,34 @@ impl<R, Q> Verify<R, Q> where
             for seed in self.seed_s..self.seed_e {
                 let mut target = Q::Target::new();
                 let mut checker = Q::Checker::new();
-                let mut gen = R::seed_from_u64(seed);
+                let mut gen = DebugRng::<Q::Target, Q::Checker, R, std::ops::Range<usize>>::new(seed);
                 if let Err(fail) = Q::verify(&mut gen, &mut target, &mut checker) {
                     self.status = VerifyStatus::Fail(fail);
                     return;
                 }
             }
             self.status = VerifyStatus::Done;
+        }
+        pub fn debug<Ran: std::ops::RangeBounds<usize>>(seed: u64, debug_ran: Ran, trace_f: fn(&Q::Target, &Q::Checker)) -> Self {
+            let mut target = Q::Target::new();
+            let mut checker = Q::Checker::new();
+            let mut gen = DebugRng::<Q::Target, Q::Checker, R, Ran>::debug_new(seed, debug_ran, trace_f);
+            if let Err(fail) = Q::verify(&mut gen, &mut target, &mut checker) {
+                Verify {
+                    seed_s: seed,
+                    seed_e: seed + 1,
+                    status: VerifyStatus::Fail(fail),
+                    _p: std::marker::PhantomData,
+                }
+            }
+            else {
+                Verify {
+                    seed_s: seed,
+                    seed_e: seed + 1,
+                    status: VerifyStatus::Done,
+                    _p: std::marker::PhantomData,
+                }
+            }
         }
     }
 impl<R, Q> std::fmt::Debug for Verify<R, Q> where

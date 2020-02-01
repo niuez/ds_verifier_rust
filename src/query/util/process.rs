@@ -1,6 +1,6 @@
 use crate::query::{ Query };
 use crate::core::{ Named, QueryFail };
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub struct Process<Q, R>(std::marker::PhantomData<(Q, R)>);
 
@@ -17,7 +17,7 @@ impl<P, Q> Query for Process<P, Q> where
     Q: Query<Target=P::Target, Checker=P::Checker>, {
         type Target = P::Target;
         type Checker = P::Checker;
-        fn verify<R: Rng>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail> {
+        fn verify<R: DebuggableRng<Self::Target, Self::Checker>>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail> {
             P::verify(gen, target, checker)?;
             Q::verify(gen, target, checker)
         }

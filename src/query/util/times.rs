@@ -1,6 +1,6 @@
 use crate::query::{ Query };
 use crate::core::{ Named, QueryFail, Number };
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub struct Times<N, Q>(std::marker::PhantomData<(N, Q)>);
 
@@ -17,7 +17,7 @@ impl<N, Q> Query for Times<N, Q> where
     Q: Query, {
         type Target = Q::Target;
         type Checker = Q::Checker;
-        fn verify<R: Rng>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail> {
+        fn verify<R: DebuggableRng<Self::Target, Self::Checker>>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail> {
             for _ in 0..N::N {
                 Q::verify(gen, target, checker)?;
             }

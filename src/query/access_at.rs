@@ -1,7 +1,7 @@
 use crate::core::{ Named, QueryFail };
 use crate::query::{ Query, Length, LengthQuery };
 use crate::data::Data;
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub trait AccessAt: Length {
     type Type: Data;
@@ -19,9 +19,12 @@ impl<T, C> Query for AccessAtQuery<T, C> where
     C: AccessAt<Type=T::Type> {
         type Target = T;
         type Checker = C;
-    fn verify<R: Rng>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
+    fn verify<R: DebuggableRng<T, C>>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
         LengthQuery::<T, C>::verify(gen, target, checker)?;
+
         let i = gen.gen_range(0, target.length());
+        gen.debugtrace(target, checker);
+
         let t_res = target.access_at(i);
         let c_res = checker.access_at(i);
         if t_res == c_res {

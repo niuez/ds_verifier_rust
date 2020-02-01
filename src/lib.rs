@@ -4,6 +4,7 @@ pub mod query;
 pub mod data;
 pub mod structures;
 pub mod verify;
+pub mod debug;
 
 define_number!(N100, 100);
 

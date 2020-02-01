@@ -1,7 +1,7 @@
 use crate::core::{ Named, QueryFail };
 use crate::query::{ Query, Length };
 use crate::data::Data;
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub trait UpdateAt: Length {
     type Type: Data;
@@ -20,9 +20,11 @@ impl<T, C> Query for UpdateAtQuery<T, C> where
     
         type Target = T;
         type Checker = C;
-        fn verify<R: Rng>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
+        fn verify<R: DebuggableRng<T, C>>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
             let i = gen.gen_range(0, target.length());
             let value = T::Type::generate(gen);
+            gen.debugtrace(target, checker);
+
             target.update_at(i, &value);
             checker.update_at(i, &value);
             Ok(())

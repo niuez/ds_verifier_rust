@@ -1,6 +1,6 @@
 use crate::core::{ Named, QueryFail };
 use crate::query::Query;
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub trait Length {
     fn length(&self) -> usize;
@@ -15,7 +15,7 @@ impl<T, C> Named for LengthQuery<T, C> {
 impl<T: Length, C: Length> Query for LengthQuery<T, C> {
     type Target = T;
     type Checker = C;
-    fn verify<R: Rng>(_: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
+    fn verify<R: DebuggableRng<T, C>>(_: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
         let t_len = target.length();
         let c_len = checker.length();
         if t_len == c_len {

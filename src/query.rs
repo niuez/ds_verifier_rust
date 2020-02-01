@@ -12,12 +12,12 @@ pub mod util;
 pub mod init;
 
 use crate::core::{ Named, QueryFail };
-use rand::Rng;
+use crate::debug::DebuggableRng;
 
 pub trait Query: Named {
     type Target;
     type Checker;
-    fn verify<R: Rng>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail>;
+    fn verify<R: DebuggableRng<Self::Target, Self::Checker>>(gen: &mut R, target: &mut Self::Target, checker: &mut Self::Checker) -> Result<(), QueryFail>;
 }
 
 impl<T, C> Named for (T, C) {
@@ -27,7 +27,7 @@ impl<T, C> Named for (T, C) {
 impl<T, C> Query for (T, C) {
     type Target = T;
     type Checker = C;
-    fn verify<R: Rng>(_: &mut R, _: &mut T, _: &mut C) -> Result<(), QueryFail> {
+    fn verify<R: DebuggableRng<T, C>>(_: &mut R, _: &mut T, _: &mut C) -> Result<(), QueryFail> {
         Ok(())
     }
 }
