@@ -22,7 +22,6 @@ impl<T, C> Query for AccessAtQuery<T, C> where
     fn verify<R: Rng>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
         LengthQuery::<T, C>::verify(gen, target, checker)?;
         let i = gen.gen_range(0, target.length());
-        println!("access at {}", i);
         let t_res = target.access_at(i);
         let c_res = checker.access_at(i);
         if t_res == c_res {

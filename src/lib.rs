@@ -9,9 +9,9 @@ define_number!(N100, 100);
 
 #[test]
 fn verify() {
-    use query::util::{ Times, Process };
+    use query::util::Times;
     use query::init::InitByVec;
-    use query::AccessAtQuery;
+    use query::{ AccessAtQuery, UpdateAtQuery };
     use verify::Verify;
     use rand_xoshiro::Xoshiro128Plus;
     type Fp = data::Mod998244353;
@@ -21,8 +21,13 @@ fn verify() {
     type VecVerify =
         Verify<
             Xoshiro128Plus,
-            Process<InitByVec<T, C, Fp, N100>, Times<N100, AccessAtQuery<T, C>>>
+            process! {
+                InitByVec<T, C, Fp, N100>,
+                InitByVec<T, C, Fp, N100>,
+                Times<N100, random_select!(AccessAtQuery<T, C>, AccessAtQuery<T, C>, UpdateAtQuery<T, C>)>
+            }
             >;
-    let result = VecVerify::verify();
+    let mut result = VecVerify::new(0, 5);
+    result.verify();
     println!("{:?}", result);
 }

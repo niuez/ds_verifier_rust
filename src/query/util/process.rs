@@ -22,3 +22,13 @@ impl<P, Q> Query for Process<P, Q> where
             Q::verify(gen, target, checker)
         }
 }
+
+#[macro_export]
+macro_rules! process {
+    ($t:ty, $($r:ty),*) => {
+        crate::query::util::Process<$t, process!($($r),*)>
+    };
+    ($t:ty) => {
+        $t
+    }
+}
