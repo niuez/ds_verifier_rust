@@ -7,6 +7,7 @@ pub use access_at::{ AccessAt, AccessAtQuery };
 pub mod update_at;
 pub use update_at::{ UpdateAt, UpdateAtQuery };
 
+#[macro_use]
 pub mod util;
 
 pub mod init;

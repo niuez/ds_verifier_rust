@@ -1,8 +1,11 @@
 use rand::{ Rng, RngCore, SeedableRng };
 
-pub trait DebuggableRng<T, C>: Rng {
+pub trait RngStatus: Rng {
     fn trace_count(&self) -> usize;
     fn seed(&self) -> u64;
+}
+
+pub trait DebuggableRng<T, C>: RngStatus {
     fn debugtrace(&mut self, target: &T, checker: &C);
 }
 
@@ -46,14 +49,17 @@ impl<T, C, R, Ran> DebugRng<T, C, R, Ran> where
         }
     }
 
+impl<T, C, R, Ran> RngStatus for DebugRng<T, C, R, Ran> where
+  R: Rng + SeedableRng, Ran: std::ops::RangeBounds<usize> {
+      fn trace_count(&self) -> usize {
+          self.cnt
+      }
+      fn seed(&self) -> u64 {
+          self.seed
+      }
+  }
 impl<T, C, R, Ran> DebuggableRng<T, C> for DebugRng<T, C, R, Ran> where
     R: Rng + SeedableRng, Ran: std::ops::RangeBounds<usize> {
-        fn trace_count(&self) -> usize {
-            self.cnt
-        }
-        fn seed(&self) -> u64 {
-            self.seed
-        }
         fn debugtrace(&mut self, target: &T, checker: &C) {
             self.cnt += 1;
             if let Some(ref ran) = self.debug_range {

@@ -23,18 +23,17 @@ impl<T, C> Query for AccessAtQuery<T, C> where
         LengthQuery::<T, C>::verify(gen, target, checker)?;
 
         let i = gen.gen_range(0, target.length());
-        gen.debugtrace(target, checker);
 
         let t_res = target.access_at(i);
         let c_res = checker.access_at(i);
+
+        gen.debugtrace(target, checker);
+
         if t_res == c_res {
             Ok(())
         }
         else {
-            Err( QueryFail {
-                fail_query: Self::name(),
-                fail_detail: format!("target results {:?} but checker results {:?}", t_res, c_res),
-            })
+            Err( QueryFail::new( Self::name(), format!("access_at {}: target results {:?} but checker results {:?}", i, t_res, c_res), gen) )
         }
     }
 }

@@ -1,5 +1,6 @@
 #[macro_use]
 pub mod core;
+#[macro_use]
 pub mod query;
 pub mod data;
 pub mod structures;
@@ -32,3 +33,4 @@ fn verify() {
     result.verify();
     println!("{:?}", result);
 }
+

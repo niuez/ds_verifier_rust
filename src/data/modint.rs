@@ -17,7 +17,7 @@ impl<M: Mod> Named for ModInt<M> {
 }
 impl<M: Mod> std::fmt::Debug for ModInt<M> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "({} mod {})", self.value(), M::m())
+        write!(f, "m({})", self.value())
     }
 }
 impl<M: Mod> Data for ModInt<M> {

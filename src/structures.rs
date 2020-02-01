@@ -1,4 +1,5 @@
 pub mod vec;
+pub mod wrong3;
 
 use crate::core::Named;
 

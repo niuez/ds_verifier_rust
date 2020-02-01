@@ -15,17 +15,14 @@ impl<T, C> Named for LengthQuery<T, C> {
 impl<T: Length, C: Length> Query for LengthQuery<T, C> {
     type Target = T;
     type Checker = C;
-    fn verify<R: DebuggableRng<T, C>>(_: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
+    fn verify<R: DebuggableRng<T, C>>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
         let t_len = target.length();
         let c_len = checker.length();
         if t_len == c_len {
             Ok(())
         }
         else {
-            Err( QueryFail {
-                fail_query: Self::name(),
-                fail_detail: format!("target's length {:?} but checker results {:?}", t_len, c_len),
-            })
+            Err( QueryFail::new(Self::name(), format!("target's length {:?} but checker results {:?}", t_len, c_len), gen))
         }
     }
 }

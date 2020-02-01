@@ -63,6 +63,11 @@ impl<R, Q> Verify<R, Q> where
                 }
             }
         }
+        pub fn panic_by_fail(&self) {
+            if let VerifyStatus::Fail(_) = self.status {
+                panic!("\n=== Fail ===\n{:?}\n============\n", self);
+            }
+        }
     }
 impl<R, Q> std::fmt::Debug for Verify<R, Q> where
     R: SeedableRng + Rng + Named,
@@ -71,11 +76,11 @@ impl<R, Q> std::fmt::Debug for Verify<R, Q> where
     Q::Checker: Structure {
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             write!(f, "Target: {}\nChecker: {}\nQuery: {}", Q::Target::name(), Q::Checker::name(), Q::name())?;
-            if let VerifyStatus::Fail(QueryFail { fail_query: ref q, fail_detail: ref d }) = self.status {
-                write!(f, "\nFail At : {} ({})", q, d)
+            if let VerifyStatus::Fail(QueryFail { query_name: ref q, detail: ref d, ref trace_cnt, ref seed }) = self.status {
+                write!(f, "\nFail At : {} ({})\ntrace_count: {}\nseed: {}", q, d, trace_cnt, seed)
             }
             else {
-                write!(f, "\n")
+                write!(f, "")
             }
         }
     }

@@ -23,10 +23,12 @@ impl<T, C> Query for UpdateAtQuery<T, C> where
         fn verify<R: DebuggableRng<T, C>>(gen: &mut R, target: &mut T, checker: &mut C) -> Result<(), QueryFail> {
             let i = gen.gen_range(0, target.length());
             let value = T::Type::generate(gen);
-            gen.debugtrace(target, checker);
 
             target.update_at(i, &value);
             checker.update_at(i, &value);
+
+            gen.debugtrace(target, checker);
+
             Ok(())
         }
 }

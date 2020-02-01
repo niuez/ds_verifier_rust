@@ -1,3 +1,5 @@
+use crate::debug::RngStatus;
+
 pub trait Named: Sized {
     fn name() -> String;
 }
@@ -7,8 +9,20 @@ impl Named for rand_xoshiro::Xoshiro128Plus {
 }
 
 pub struct QueryFail {
-    pub fail_query: String,
-    pub fail_detail: String,
+    pub query_name: String,
+    pub detail: String,
+    pub trace_cnt: usize,
+    pub seed: u64,
+}
+
+impl QueryFail {
+    pub fn new<R: RngStatus>(query_name: String, detail: String, gen: &R) -> Self {
+        QueryFail {
+            query_name, detail,
+            trace_cnt: gen.trace_count(),
+            seed: gen.seed(),
+        }
+    }
 }
 
 pub trait Number {
